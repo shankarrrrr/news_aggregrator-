@@ -10,13 +10,14 @@ load_dotenv()
 def analyse_article(title, content):
     """
     Analyze an article for UPSC exam relevance using Google Gemini API.
+    Translates non-English content to English.
     
     Args:
         title: Article title
         content: Article content
         
     Returns:
-        dict: Analysis with category, scores, exam angle, and summary
+        dict: Analysis with category, scores, exam angle, summary, and English title
     """
     api_key = os.environ.get('GEMINI_API_KEY')
     if not api_key:
@@ -27,23 +28,27 @@ def analyse_article(title, content):
     
     prompt = f"""You are a UPSC exam expert. Analyze the following article and provide a structured assessment.
 
+IMPORTANT: If the title or content is in Hindi or any non-English language, first translate it to English.
+
 Article Title: {title}
 Article Content: {content}
 
 Think step by step:
-1. First, identify the main theme and subject area
-2. Evaluate its relevance for UPSC Prelims (factual, current affairs)
-3. Evaluate its relevance for UPSC Mains (analytical, essay potential)
-4. Determine why this matters for UPSC preparation
-5. Create a concise summary for aspirants
+1. If the title is in Hindi/non-English, translate it to English
+2. Identify the main theme and subject area
+3. Evaluate its relevance for UPSC Prelims (factual, current affairs)
+4. Evaluate its relevance for UPSC Mains (analytical, essay potential)
+5. Determine why this matters for UPSC preparation
+6. Create a concise summary for aspirants
 
 Now provide your analysis in this exact JSON format:
 {{
+    "title_english": "<English translation of title if non-English, otherwise same as original>",
     "category": "<one of: Polity, Economy, Environment, Science & Tech, International Relations, History & Culture, Social Issues, Security & Defence>",
     "prelims_score": <number 1-10>,
     "mains_score": <number 1-10>,
-    "exam_angle": "<one sentence explaining UPSC relevance>",
-    "summary": "<2 lines summarizing key points for UPSC aspirants>"
+    "exam_angle": "<one sentence explaining UPSC relevance in English>",
+    "summary": "<2-3 lines summarizing key points for UPSC aspirants in English>"
 }}
 
 Return only valid JSON, no additional text."""

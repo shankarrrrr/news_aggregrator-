@@ -2,3 +2,11 @@ google-generativeai
 python-dotenv
 feedparser
 reportlab
+fastapi
+uvicorn[standard]
+pydantic
+python-jose[cryptography]
+passlib[bcrypt]
+python-multipart
+apscheduler
+gTTS

@@ -1,12 +1,21 @@
 # Environment variables
 .env
+.env.local
+.env.*.local
 
 # Output directory
 output/
+audio/
 
 # Generated files
 *.pdf
 *.html
+
+# Database
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
 
 # Python
 __pycache__/
@@ -49,3 +58,20 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Node (Dashboard)
+dashboard/node_modules/
+dashboard/build/
+dashboard/.env
+dashboard/.env.local
+
+# Test files
+test_*.py
+check_*.py
+*_test.py
+migrate_*.py
+
+# Temporary
+*.tmp
+*.bak
+*.cache

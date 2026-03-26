@@ -1,5 +1,57 @@
-"""Utility modules for PDF generation and helpers"""
+"""Utility modules for PDF generation and database operations"""
 
 from .pdf_generator import generate_pdf_analysis
+from .database import (
+    get_connection,
+    init_db,
+    insert_session,
+    get_session_by_token,
+    get_session_by_id,
+    update_session_status,
+    get_all_sessions,
+    insert_article,
+    get_articles_by_session,
+    get_article_by_id,
+    insert_mcq,
+    get_mcqs_by_article,
+    get_mcqs_by_session,
+    get_mcq_by_id,
+    insert_attempt,
+    get_attempts_by_session,
+    get_attempts_by_mcq,
+    upsert_user_performance,
+    get_all_performance,
+    get_performance_by_category,
+    insert_feedback_profile,
+    get_latest_feedback_profile,
+    get_feedback_by_session,
+    get_session_stats
+)
 
-__all__ = ['generate_pdf_analysis']
+__all__ = [
+    'generate_pdf_analysis',
+    'get_connection',
+    'init_db',
+    'insert_session',
+    'get_session_by_token',
+    'get_session_by_id',
+    'update_session_status',
+    'get_all_sessions',
+    'insert_article',
+    'get_articles_by_session',
+    'get_article_by_id',
+    'insert_mcq',
+    'get_mcqs_by_article',
+    'get_mcqs_by_session',
+    'get_mcq_by_id',
+    'insert_attempt',
+    'get_attempts_by_session',
+    'get_attempts_by_mcq',
+    'upsert_user_performance',
+    'get_all_performance',
+    'get_performance_by_category',
+    'insert_feedback_profile',
+    'get_latest_feedback_profile',
+    'get_feedback_by_session',
+    'get_session_stats'
+]
