@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import LanguageSelector from './LanguageSelector';
 import './Auth.css';
 
 function Auth({ mode = 'login' }) {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -66,11 +69,14 @@ function Auth({ mode = 'login' }) {
     <div className="auth-page">
       <header className="header">
         <div className="header-content">
-          <div className="header-brand">NEWSNEXUS</div>
-          <h1 className="header-title">{isSignup ? 'Create Account' : 'Welcome Back'}</h1>
+          <div className="header-brand">{t('app.name')}</div>
+          <h1 className="header-title">{isSignup ? t('auth.create_account') : t('auth.welcome_back')}</h1>
           <p className="header-subtitle">
-            {isSignup ? 'Sign up to start your UPSC journey' : 'Curated by autonomous AI agents for serious aspirants'}
+            {isSignup ? t('auth.signup_subtitle') : t('app.subtitle')}
           </p>
+        </div>
+        <div className="header-actions" style={{ position: 'absolute', top: '20px', right: '20px' }}>
+          <LanguageSelector />
         </div>
       </header>
 
@@ -79,68 +85,68 @@ function Auth({ mode = 'login' }) {
           <form onSubmit={handleSubmit} className="auth-form">
             {isSignup && (
               <div className="form-group">
-                <label htmlFor="name">Name (Optional)</label>
+                <label htmlFor="name">{t('auth.name')}</label>
                 <input
                   type="text"
                   id="name"
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
-                  placeholder="Your name"
+                  placeholder={t('auth.name_placeholder')}
                 />
               </div>
             )}
 
             <div className="form-group">
-              <label htmlFor="email">Email</label>
+              <label htmlFor="email">{t('auth.email')}</label>
               <input
                 type="email"
                 id="email"
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                placeholder="your@email.com"
+                placeholder={t('auth.email_placeholder')}
                 required
               />
             </div>
 
             <div className="form-group">
-              <label htmlFor="password">Password</label>
+              <label htmlFor="password">{t('auth.password')}</label>
               <input
                 type="password"
                 id="password"
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
-                placeholder="••••••••"
+                placeholder={t('auth.password_placeholder')}
                 required
                 minLength={6}
               />
               {isSignup && (
-                <small className="form-hint">At least 6 characters</small>
+                <small className="form-hint">{t('auth.password_hint')}</small>
               )}
             </div>
 
             {error && <div className="error-message">{error}</div>}
 
             <button type="submit" className="auth-submit" disabled={loading}>
-              {loading ? 'Please wait...' : (isSignup ? 'Sign Up' : 'Login')}
+              {loading ? t('auth.please_wait') : (isSignup ? t('auth.signup') : t('auth.login'))}
             </button>
           </form>
 
           <div className="auth-footer">
             {isSignup ? (
               <p>
-                Already have an account?{' '}
+                {t('auth.already_have_account')}{' '}
                 <span className="auth-link" onClick={() => navigate('/login')}>
-                  Login
+                  {t('auth.login')}
                 </span>
               </p>
             ) : (
               <p>
-                Don't have an account?{' '}
+                {t('auth.dont_have_account')}{' '}
                 <span className="auth-link" onClick={() => navigate('/signup')}>
-                  Sign up
+                  {t('auth.sign_up')}
                 </span>
               </p>
             )}

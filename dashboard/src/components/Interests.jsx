@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import LanguageSelector from './LanguageSelector';
 import './Interests.css';
 
 const CATEGORIES = [
@@ -15,6 +17,7 @@ const CATEGORIES = [
 
 function Interests() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -29,7 +32,7 @@ function Interests() {
 
   const handleSubmit = async () => {
     if (selectedCategories.length === 0) {
-      setError('Please select at least one category');
+      setError(t('interests.save_error'));
       return;
     }
 
@@ -64,9 +67,12 @@ function Interests() {
     <div className="interests-page">
       <header className="header">
         <div className="header-content">
-          <div className="header-brand">NEWSNEXUS</div>
-          <h1 className="header-title">Choose Your Interests</h1>
-          <p className="header-subtitle">Select topics to personalize your daily intelligence brief</p>
+          <div className="header-brand">{t('app.name')}</div>
+          <h1 className="header-title">{t('interests.title')}</h1>
+          <p className="header-subtitle">{t('interests.subtitle')}</p>
+        </div>
+        <div className="header-actions" style={{ position: 'absolute', top: '20px', right: '20px' }}>
+          <LanguageSelector />
         </div>
       </header>
 
@@ -87,7 +93,7 @@ function Interests() {
           {error && <div className="error-message">{error}</div>}
 
           <div className="selected-count">
-            {selectedCategories.length} {selectedCategories.length === 1 ? 'category' : 'categories'} selected
+            {t(selectedCategories.length === 1 ? 'interests.category_selected' : 'interests.categories_selected', { count: selectedCategories.length })}
           </div>
 
           <div className="interests-actions">
@@ -96,13 +102,13 @@ function Interests() {
               onClick={handleSubmit}
               disabled={loading || selectedCategories.length === 0}
             >
-              {loading ? 'Saving...' : 'Continue'}
+              {loading ? t('interests.saving') : t('interests.continue')}
             </button>
             <button 
               className="btn-skip"
               onClick={() => navigate('/user-dashboard')}
             >
-              Skip for now
+              {t('interests.skip')}
             </button>
           </div>
         </div>

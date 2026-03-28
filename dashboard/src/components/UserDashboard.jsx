@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import LanguageSelector from './LanguageSelector';
 import './UserDashboard.css';
 
 function UserDashboard() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [user, setUser] = useState(null);
   const [sessionStatus, setSessionStatus] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -113,15 +116,16 @@ function UserDashboard() {
     <div className="user-dashboard-page">
       <header className="header">
         <div className="header-content">
-          <div className="header-brand">NEWSNEXUS</div>
-          <h1 className="header-title">Your Dashboard</h1>
+          <div className="header-brand">{t('app.name')}</div>
+          <h1 className="header-title">{t('dashboard.your_dashboard')}</h1>
           <p className="header-subtitle">
-            {user ? `Welcome, ${user.name || user.email}` : 'Curated by autonomous AI agents for serious aspirants'}
+            {user ? t('dashboard.welcome', { name: user.name || user.email }) : t('app.subtitle')}
           </p>
         </div>
         <div className="header-actions">
-          <button className="btn-logout" onClick={handleLogout}>
-            Logout
+          <LanguageSelector />
+          <button className="btn-logout" onClick={handleLogout} style={{ marginLeft: '10px' }}>
+            {t('dashboard.logout')}
           </button>
         </div>
       </header>
@@ -129,9 +133,9 @@ function UserDashboard() {
       <div className="user-dashboard-content">
         <div className="dashboard-main">
           <div className="dashboard-card">
-            <h2 className="card-title">Daily Intelligence Brief</h2>
+            <h2 className="card-title">{t('dashboard.daily_brief_title')}</h2>
             <p className="card-description">
-              Generate a personalized news digest with AI-curated articles and MCQs mapped to GS Papers
+              {t('dashboard.daily_brief_desc')}
             </p>
 
             {error && <div className="error-message">{error}</div>}
@@ -139,7 +143,7 @@ function UserDashboard() {
             {sessionStatus?.status === 'ready' ? (
               <div className="session-ready">
                 <div className="ready-icon">✓</div>
-                <p className="ready-text">Your latest session is ready!</p>
+                <p className="ready-text">{t('dashboard.session_ready')}</p>
                 <p className="ready-date">
                   {new Date(sessionStatus.session_date).toLocaleDateString('en-US', { 
                     weekday: 'long', 
@@ -152,23 +156,23 @@ function UserDashboard() {
                   className="btn-view-session"
                   onClick={handleViewSession}
                 >
-                  View Session
+                  {t('dashboard.view_session')}
                 </button>
               </div>
             ) : (
               <div className="no-session">
                 <div className="no-session-icon">📰</div>
-                <p className="no-session-text">No active session yet</p>
+                <p className="no-session-text">{t('dashboard.no_session')}</p>
                 <button 
                   className="btn-trigger"
                   onClick={handleTriggerPipeline}
                   disabled={triggering}
                 >
-                  {triggering ? 'Generating...' : 'Generate New Session'}
+                  {triggering ? t('dashboard.generating') : t('dashboard.generate_session')}
                 </button>
                 {triggering && (
                   <p className="trigger-note">
-                    This may take a few minutes. You'll be redirected when ready.
+                    {t('dashboard.trigger_note')}
                   </p>
                 )}
               </div>
@@ -177,30 +181,30 @@ function UserDashboard() {
 
           <div className="dashboard-info">
             <div className="info-card">
-              <h3 className="info-title">How it works</h3>
+              <h3 className="info-title">{t('dashboard.how_it_works')}</h3>
               <ol className="info-list">
-                <li>Click "Generate New Session" to start</li>
-                <li>AI curates relevant news articles</li>
-                <li>Practice with GS Paper-mapped MCQs</li>
-                <li>Learn with detailed insights and explanations</li>
+                <li>{t('dashboard.step1')}</li>
+                <li>{t('dashboard.step2')}</li>
+                <li>{t('dashboard.step3')}</li>
+                <li>{t('dashboard.step4')}</li>
               </ol>
             </div>
 
             <div className="info-card">
-              <h3 className="info-title">Quick Actions</h3>
+              <h3 className="info-title">{t('dashboard.quick_actions')}</h3>
               <div className="action-buttons">
                 <button 
                   className="action-button"
                   onClick={handleTriggerPipeline}
                   disabled={triggering}
                 >
-                  {triggering ? 'Running Pipeline...' : 'Run Pipeline'}
+                  {triggering ? t('dashboard.running_pipeline') : t('dashboard.run_pipeline')}
                 </button>
                 <button 
                   className="action-button"
                   onClick={() => navigate('/interests')}
                 >
-                  Update Interests
+                  {t('dashboard.update_interests')}
                 </button>
               </div>
             </div>

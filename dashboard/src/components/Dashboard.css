@@ -491,13 +491,14 @@ body {
   transition: background-color 100ms ease, border-color 100ms ease;
 }
 
-.option-button:hover:not(:disabled) {
+.option-button:hover:not(.disabled) {
   background-color: #e8e2d6;
   border-left: 2px solid var(--accent-amber);
 }
 
-.option-button:disabled {
+.option-button.disabled {
   cursor: default;
+  pointer-events: none;
 }
 
 .option-letter {

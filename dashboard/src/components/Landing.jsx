@@ -1,43 +1,49 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import LanguageSelector from './LanguageSelector';
 import './Landing.css';
 
 function Landing() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   return (
     <div className="landing-page">
       <header className="header">
         <div className="header-content">
-          <div className="header-brand">NEWSNEXUS</div>
-          <h1 className="header-title">UPSC Daily Intelligence</h1>
-          <p className="header-subtitle">Curated by autonomous AI agents for serious aspirants</p>
+          <div className="header-brand">{t('app.name')}</div>
+          <h1 className="header-title">{t('app.tagline')}</h1>
+          <p className="header-subtitle">{t('app.subtitle')}</p>
+        </div>
+        <div className="header-actions">
+          <LanguageSelector />
         </div>
       </header>
 
       <div className="landing-content">
         <div className="landing-hero">
-          <h2 className="hero-title">Your AI-Powered UPSC Preparation Platform</h2>
+          <h2 className="hero-title">{t('landing.hero_title')}</h2>
           <p className="hero-description">
-            Daily curated news, intelligent MCQs, and personalized learning insights mapped to GS Papers
+            {t('landing.hero_description')}
           </p>
         </div>
 
         <div className="landing-features">
           <div className="feature-card">
             <div className="feature-icon">📰</div>
-            <h3 className="feature-title">Curated News</h3>
-            <p className="feature-description">Daily selection of UPSC-relevant articles from PIB, The Hindu, and Indian Express</p>
+            <h3 className="feature-title">{t('landing.feature_news_title')}</h3>
+            <p className="feature-description">{t('landing.feature_news_desc')}</p>
           </div>
           <div className="feature-card">
             <div className="feature-icon">🎯</div>
-            <h3 className="feature-title">Smart MCQs</h3>
-            <p className="feature-description">AI-generated questions mapped to GS Papers with detailed explanations</p>
+            <h3 className="feature-title">{t('landing.feature_mcq_title')}</h3>
+            <p className="feature-description">{t('landing.feature_mcq_desc')}</p>
           </div>
           <div className="feature-card">
             <div className="feature-icon">📚</div>
-            <h3 className="feature-title">Learning Insights</h3>
-            <p className="feature-description">Key takeaways and concepts to remember for better retention</p>
+            <h3 className="feature-title">{t('landing.feature_insights_title')}</h3>
+            <p className="feature-description">{t('landing.feature_insights_desc')}</p>
           </div>
         </div>
 
@@ -46,13 +52,13 @@ function Landing() {
             className="btn-primary"
             onClick={() => navigate('/signup')}
           >
-            Get Started
+            {t('landing.get_started')}
           </button>
           <button 
             className="btn-secondary"
             onClick={() => navigate('/login')}
           >
-            Login
+            {t('landing.login')}
           </button>
         </div>
       </div>

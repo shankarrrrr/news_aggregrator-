@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import LanguageSelector from './LanguageSelector';
 import './Dashboard.css';
 
 const API_BASE = 'http://localhost:8000';
 
 const Dashboard = () => {
   const { token } = useParams();
+  const { t, i18n } = useTranslation();
   const [session, setSession] = useState(null);
   const [selectedArticle, setSelectedArticle] = useState(null);
   const [currentMCQ, setCurrentMCQ] = useState(null);
@@ -41,10 +44,25 @@ const Dashboard = () => {
     };
   }, [error]);
 
-  const fetchSession = async () => {
+  // Helper function to translate category names
+  const translateCategory = (category) => {
+    const categoryMap = {
+      'Polity': 'categories.polity',
+      'Economy': 'categories.economy',
+      'International Relations': 'categories.international_relations',
+      'Environment': 'categories.environment',
+      'Science & Tech': 'categories.science_tech',
+      'History & Culture': 'categories.history_culture',
+      'Security & Defence': 'categories.security_defence',
+      'Social Issues': 'categories.social_issues'
+    };
+    return t(categoryMap[category] || category);
+  };
+
+  const fetchSession = async (autoSelectNext = true) => {
     try {
       console.log('[Dashboard] Fetching session with token:', token);
-      const response = await fetch(`${API_BASE}/session/${token}`);
+      const response = await fetch(`${API_BASE}/session/${token}?lang=${i18n.language}`);
       if (!response.ok) throw new Error('Session not found');
       const data = await response.json();
       
@@ -53,7 +71,7 @@ const Dashboard = () => {
       console.log('[Dashboard] Articles count:', data.articles?.length);
       
       if (data.status === 'pending') {
-        setError('Intelligence brief being prepared... This may take a few minutes.');
+        setError(t('session.preparing'));
         setLoading(false);
         return;
       }
@@ -78,8 +96,8 @@ const Dashboard = () => {
       const allAttempted = data.articles.every(a => a.attempted);
       if (allAttempted) {
         fetchResults();
-      } else {
-        // Select first unattempted article
+      } else if (autoSelectNext) {
+        // Only auto-select first unattempted article if autoSelectNext is true
         const firstUnattempted = data.articles.find(a => !a.attempted);
         if (firstUnattempted) {
           console.log('[Dashboard] Selecting first unattempted article:', firstUnattempted.title);
@@ -105,9 +123,10 @@ const Dashboard = () => {
     setSelectedArticle(article);
     setSelectedOption(null);
     setAttemptResult(null);
+    setCanSubmit(true); // Reset submit flag
     
     try {
-      const response = await fetch(`${API_BASE}/session/${token}/mcq/${article.id}`);
+      const response = await fetch(`${API_BASE}/session/${token}/mcq/${article.id}?lang=${i18n.language}`);
       const mcq = await response.json();
       console.log('[Dashboard] MCQ loaded:', {
         id: mcq.id,
@@ -120,16 +139,46 @@ const Dashboard = () => {
     }
   };
 
-  const handleOptionSelect = (option) => {
+  const [canSubmit, setCanSubmit] = useState(true);
+
+  const handleOptionSelect = (option, event) => {
+    console.log('[Dashboard] handleOptionSelect called with option:', option);
+    
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      console.log('[Dashboard] Event prevented and stopped');
+    }
+    
     if (attemptResult) {
       console.log('[Dashboard] Option select blocked - already answered');
       return;
     }
-    console.log('[Dashboard] Option selected:', option);
+    
+    console.log('[Dashboard] Setting selected option to:', option);
     setSelectedOption(option);
+    
+    // Prevent immediate submission with a very short delay
+    setCanSubmit(false);
+    setTimeout(() => {
+      setCanSubmit(true);
+      console.log('[Dashboard] Submit now enabled');
+    }, 50); // Reduced to 50ms - just enough to prevent accidental double-click
+    
+    console.log('[Dashboard] Option selection complete - NOT submitting');
   };
 
   const submitAttempt = async () => {
+    console.log('[Dashboard] submitAttempt called');
+    console.log('[Dashboard] attemptResult:', attemptResult);
+    console.log('[Dashboard] selectedOption:', selectedOption);
+    console.log('[Dashboard] canSubmit:', canSubmit);
+    
+    if (!canSubmit) {
+      console.log('[Dashboard] Submit blocked - too soon after selection');
+      return;
+    }
+    
     if (attemptResult || !selectedOption) {
       console.log('[Dashboard] Submit blocked - already answered or no option selected');
       return;
@@ -138,7 +187,7 @@ const Dashboard = () => {
     console.log('[Dashboard] Submitting attempt for article:', selectedArticle.id, 'option:', selectedOption);
     
     try {
-      const response = await fetch(`${API_BASE}/session/${token}/attempt`, {
+      const response = await fetch(`${API_BASE}/session/${token}/attempt?lang=${i18n.language}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -153,10 +202,10 @@ const Dashboard = () => {
       console.log('[Dashboard] Attempt result:', result);
       setAttemptResult(result);
       
-      // Refresh session to update attempted status
+      // Refresh session to update attempted status, but don't auto-select next
       setTimeout(() => {
         console.log('[Dashboard] Refreshing session after attempt');
-        fetchSession();
+        fetchSession(false); // Pass false to prevent auto-selecting next article
       }, 500);
     } catch (err) {
       console.error('[Dashboard] Failed to submit attempt:', err);
@@ -191,6 +240,7 @@ const Dashboard = () => {
     // Clear current state
     setAttemptResult(null);
     setSelectedOption(null);
+    setCanSubmit(true); // Reset submit flag
     
     // Find next unattempted article
     const nextUnattempted = session.articles.find(a => !a.attempted && a.id !== selectedArticle.id);
@@ -242,20 +292,23 @@ const Dashboard = () => {
       <div className="error-container">
         <header className="header">
           <div className="header-content">
-            <div className="header-brand">NEWSNEXUS</div>
-            <h1 className="header-title">UPSC Daily Intelligence</h1>
-            <p className="header-subtitle">Curated by autonomous AI agents for serious aspirants</p>
+            <div className="header-brand">{t('app.name')}</div>
+            <h1 className="header-title">{t('app.tagline')}</h1>
+            <p className="header-subtitle">{t('app.subtitle')}</p>
+          </div>
+          <div className="header-actions" style={{ position: 'absolute', top: '20px', right: '20px' }}>
+            <LanguageSelector />
           </div>
         </header>
         <div className="error-content">
           <div className="error-icon">⏳</div>
           <h1 className="error-title">{error}</h1>
           <p className="error-subtitle">
-            {error.includes('being prepared') 
+            {error.includes('prepared') || error.includes('preparing')
               ? 'The AI agents are analyzing articles and generating questions. This page will automatically refresh when ready.'
               : 'Please check your link and try again.'}
           </p>
-          {error.includes('being prepared') && (
+          {(error.includes('prepared') || error.includes('preparing')) && (
             <div className="loading-dots" style={{ marginTop: '24px' }}>···</div>
           )}
         </div>
@@ -276,19 +329,22 @@ const Dashboard = () => {
       {/* Header */}
       <header className="header">
         <div className="header-content">
-          <div className="header-brand">NEWSNEXUS</div>
-          <h1 className="header-title">UPSC Daily Intelligence</h1>
-          <p className="header-subtitle">Curated by autonomous AI agents for serious aspirants</p>
+          <div className="header-brand">{t('app.name')}</div>
+          <h1 className="header-title">{t('app.tagline')}</h1>
+          <p className="header-subtitle">{t('app.subtitle')}</p>
           <div className="header-date">{new Date(session.session_date).toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).toUpperCase()}</div>
+        </div>
+        <div className="header-actions" style={{ position: 'absolute', top: '20px', right: '20px' }}>
+          <LanguageSelector />
         </div>
       </header>
       <div className="header-coverage">
         <div className="coverage-content">
-          <span className="coverage-label">Today's Coverage:</span>
+          <span className="coverage-label">{t('session.todays_coverage')}:</span>
           {Object.entries(session.coverage_summary).map(([cat, count], idx) => (
             <span key={cat}>
               {idx > 0 && ' | '}
-              <strong>{count}</strong> {cat}
+              <strong>{count}</strong> {translateCategory(cat)}
             </span>
           ))}
         </div>
@@ -297,7 +353,7 @@ const Dashboard = () => {
       {/* Focus Note */}
       {session.focus_note && (
         <div className="focus-note">
-          💡 Today's Focus: {session.focus_note}
+          💡 {t('session.todays_focus')}: {session.focus_note}
         </div>
       )}
 
@@ -312,7 +368,7 @@ const Dashboard = () => {
               onClick={() => selectArticle(article)}
             >
               <div className="article-header">
-                <span className="article-category">{article.category}</span>
+                <span className="article-category">{translateCategory(article.category)}</span>
                 <span className="article-source">{article.source}</span>
               </div>
               <div className="article-title">
@@ -325,11 +381,11 @@ const Dashboard = () => {
               </div>
               <div className="article-relevance">
                 <span className="relevance-item">
-                  <span className="relevance-label">PRELIMS</span>
+                  <span className="relevance-label">{t('session.prelims').toUpperCase()}</span>
                   <span className="relevance-value">{article.prelims_score}/10</span>
                 </span>
                 <span className="relevance-item">
-                  <span className="relevance-label">MAINS</span>
+                  <span className="relevance-label">{t('session.mains').toUpperCase()}</span>
                   <span className="relevance-value">{article.mains_score}/10</span>
                 </span>
               </div>
@@ -343,7 +399,7 @@ const Dashboard = () => {
             <div className="mcq-card">
               <div className="mcq-header">
                 <span className="mcq-source">{selectedArticle.source}</span>
-                <span className="mcq-category">{selectedArticle.category}</span>
+                <span className="mcq-category">{translateCategory(selectedArticle.category)}</span>
               </div>
               <div className="mcq-divider"></div>
               
@@ -358,26 +414,40 @@ const Dashboard = () => {
               
               <div className="mcq-options">
                 {['A', 'B', 'C', 'D'].map(letter => (
-                  <button
+                  <div
                     key={letter}
-                    type="button"
                     className={`option-button ${
                       selectedOption === letter ? 'selected' : ''
                     } ${
                       attemptResult && attemptResult.correct_option === letter ? 'correct-answer' : ''
                     } ${
                       attemptResult && selectedOption === letter && !attemptResult.is_correct ? 'wrong-answer' : ''
+                    } ${
+                      attemptResult ? 'disabled' : ''
                     }`}
                     onClick={(e) => {
+                      console.log('[Dashboard] Option div clicked:', letter);
                       e.preventDefault();
                       e.stopPropagation();
-                      handleOptionSelect(letter);
+                      if (!attemptResult) {
+                        console.log('[Dashboard] Calling handleOptionSelect for:', letter);
+                        handleOptionSelect(letter, e);
+                      } else {
+                        console.log('[Dashboard] Click ignored - already answered');
+                      }
                     }}
-                    disabled={!!attemptResult}
+                    role="button"
+                    tabIndex={attemptResult ? -1 : 0}
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter' && !attemptResult) {
+                        e.preventDefault();
+                        handleOptionSelect(letter, e);
+                      }
+                    }}
                   >
-                    <span className="option-letter">{letter}</span>
-                    <span className="option-text">{currentMCQ[`option_${letter.toLowerCase()}`]}</span>
-                  </button>
+                    <span className="option-letter" onClick={(e) => e.stopPropagation()}>{letter}</span>
+                    <span className="option-text" onClick={(e) => e.stopPropagation()}>{currentMCQ[`option_${letter.toLowerCase()}`]}</span>
+                  </div>
                 ))}
               </div>
               
@@ -386,27 +456,32 @@ const Dashboard = () => {
                   <button 
                     type="button"
                     className="submit-button" 
+                    style={{ opacity: canSubmit ? 1 : 0.6, transition: 'opacity 0.05s' }}
+                    disabled={!canSubmit}
                     onClick={(e) => {
+                      console.log('[Dashboard] Submit button clicked');
                       e.preventDefault();
                       e.stopPropagation();
-                      submitAttempt();
+                      if (canSubmit) {
+                        submitAttempt();
+                      }
                     }}
                   >
-                    Submit Answer
+                    {t('session.submit_answer')}
                   </button>
                 </div>
               )}
               
               {attemptResult && (
                 <div className="explanation-box">
-                  <div className="explanation-label">EXPLANATION</div>
+                  <div className="explanation-label">{t('session.explanation').toUpperCase()}</div>
                   {formatExplanation(attemptResult.explanation)}
                   
                   {attemptResult.learning_insight && (
                     <div className="learning-insight">
                       <div className="insight-icon">💡</div>
                       <div className="insight-content">
-                        <div className="insight-label">KEY LEARNING</div>
+                        <div className="insight-label">{t('session.learning_insight').toUpperCase()}</div>
                         <p className="insight-text">{attemptResult.learning_insight}</p>
                       </div>
                     </div>
@@ -421,18 +496,18 @@ const Dashboard = () => {
                       goToNextQuestion();
                     }}
                   >
-                    Next Question →
+                    {t('session.next_article')} →
                   </button>
                 </div>
               )}
             </div>
           ) : selectedArticle ? (
             <div className="mcq-placeholder">
-              <p>Loading question...</p>
+              <p>{t('common.loading')}</p>
             </div>
           ) : (
             <div className="mcq-placeholder">
-              <p>Select an article from the sidebar to begin</p>
+              <p>{t('session.select_option')}</p>
             </div>
           )}
         </main>
@@ -442,20 +517,22 @@ const Dashboard = () => {
       <div className="stats-bar">
         <span>Progress <strong>{attemptedCount}</strong>/{session.articles.length}</span>
         <span className="stat-separator">·</span>
-        <span>Understood <strong className="stat-highlight">{correctCount}</strong></span>
+        <span>Correct <strong className="stat-highlight">{correctCount}</strong></span>
         <span className="stat-separator">·</span>
-        <span>Learning Rate <strong className="stat-highlight">{scorePercent}%</strong></span>
+        <span>Score <strong className="stat-highlight">{scorePercent}%</strong></span>
       </div>
     </div>
   );
 };
 
 const ResultsScreen = ({ results, performance }) => {
+  const { t } = useTranslation();
+  
   // Safety checks for undefined data
   if (!results || !results.per_question) {
     return (
       <div className="loading-container">
-        <div className="loading-dots">Loading results...</div>
+        <div className="loading-dots">{t('common.loading')}</div>
       </div>
     );
   }
@@ -474,24 +551,27 @@ const ResultsScreen = ({ results, performance }) => {
     <div className="results-screen">
       <header className="header">
         <div className="header-content">
-          <div className="header-brand">NEWSNEXUS</div>
-          <h1 className="header-title">Learning Summary</h1>
+          <div className="header-brand">{t('app.name')}</div>
+          <h1 className="header-title">{t('results.title')}</h1>
           <p className="header-subtitle">Your UPSC preparation insights</p>
+        </div>
+        <div className="header-actions" style={{ position: 'absolute', top: '20px', right: '20px' }}>
+          <LanguageSelector />
         </div>
       </header>
 
       <div className="results-content">
         <div className="results-score">
           <div className="score-big">{results.total_correct}/{results.total_questions}</div>
-          <div className="score-subtitle">concepts understood</div>
-          <div className="score-percent">{results.score_percent}% retention rate</div>
+          <div className="score-subtitle">{t('results.correct_answers', { correct: results.total_correct, total: results.total_questions })}</div>
+          <div className="score-percent">{results.score_percent}%</div>
         </div>
 
         <div className="results-divider"></div>
 
         {/* GS Paper-wise Analysis */}
         <div className="gs-analysis-section">
-          <h3 className="results-section-title">GS Paper-wise Coverage</h3>
+          <h3 className="results-section-title">{t('results.performance_by_category')}</h3>
           {Object.entries(questionsByGS).map(([gsPaper, questions]) => {
             const correct = questions.filter(q => q.is_correct).length;
             const total = questions.length;
@@ -517,13 +597,13 @@ const ResultsScreen = ({ results, performance }) => {
         <div className="results-divider"></div>
 
         <div className="results-table-container">
-          <h3 className="results-section-title">Question Analysis</h3>
+          <h3 className="results-section-title">{t('results.review_answers')}</h3>
           <table className="results-table">
             <thead>
               <tr>
                 <th>Article</th>
-                <th>Category</th>
-                <th>GS Paper</th>
+                <th>{t('results.category')}</th>
+                <th>{t('session.gs_paper')}</th>
                 <th>Status</th>
               </tr>
             </thead>
@@ -535,7 +615,7 @@ const ResultsScreen = ({ results, performance }) => {
                   <td className="gs-paper-cell">{q.gs_paper || 'General'}</td>
                   <td className="correct-cell">
                     <span className={q.is_correct ? 'correct-icon' : 'wrong-icon'}>
-                      {q.is_correct ? '✓ Understood' : '✗ Review'}
+                      {q.is_correct ? `✓ ${t('session.correct')}` : `✗ ${t('session.incorrect')}`}
                     </span>
                   </td>
                 </tr>
@@ -557,7 +637,7 @@ const ResultsScreen = ({ results, performance }) => {
 
         {performance && performance.length > 0 && (
           <div className="performance-section">
-            <h3 className="results-section-title">Overall Learning Progress</h3>
+            <h3 className="results-section-title">{t('results.performance_by_category')}</h3>
             <div className="performance-bars">
               {performance.map(perf => (
                 <div key={perf.category} className="performance-bar-item">
@@ -572,7 +652,7 @@ const ResultsScreen = ({ results, performance }) => {
                     ></div>
                   </div>
                   <div className="performance-stats">
-                    {perf.total_correct}/{perf.total_attempted} concepts mastered
+                    {perf.total_correct}/{perf.total_attempted} {t('results.questions')}
                   </div>
                 </div>
               ))}
