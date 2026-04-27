@@ -1,12 +1,13 @@
 # NewsNexus 🗞️
 
 > **Autonomous Multi-Agent AI System for UPSC Preparation**  
-> A production-ready agentic AI pipeline that autonomously curates, analyzes, and delivers personalized UPSC intelligence briefs with zero human intervention.
+> A production-ready agentic AI pipeline that autonomously curates, analyzes, and delivers personalized UPSC intelligence briefs with multilingual support across 12 Indian languages.
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-green.svg)](https://fastapi.tiangolo.com/)
 [![React](https://img.shields.io/badge/React-18.0+-61DAFB.svg)](https://reactjs.org/)
 [![Agentic AI](https://img.shields.io/badge/Agentic-AI-purple.svg)](https://github.com/yourusername/newsnexus)
+[![Multilingual](https://img.shields.io/badge/Languages-12-orange.svg)](https://github.com/yourusername/newsnexus)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ---
@@ -25,6 +26,60 @@ Unlike traditional AI applications that require human prompts for each task, New
 - ✅ **Parallel Execution** - Multiple agents work simultaneously on different tasks
 - ✅ **Self-Contained Logic** - Each agent encapsulates its own reasoning and execution
 - ✅ **Adaptive Filtering** - Quality thresholds automatically filter low-value content
+- ✅ **Multilingual Support** - Content available in 12 Indian languages with AI-powered translation
+
+---
+
+## ✨ Key Features
+
+### 🌐 Multilingual Support (12 Indian Languages)
+- **Powered by Sarvam AI** - Professional-grade translation for Indian languages
+- **Supported Languages**: English, Hindi, Tamil, Telugu, Bengali, Marathi, Gujarati, Kannada, Malayalam, Punjabi, Odia, Assamese
+- **Real-time Translation** - Articles, MCQs, and explanations translated on-demand
+- **Native Script Support** - Content displayed in authentic regional scripts
+- **Language Persistence** - User language preference saved across sessions
+
+### 🔐 User Authentication & Personalization
+- **JWT-based Authentication** - Secure token-based auth with bcrypt password hashing
+- **User Profiles** - Personalized dashboard with saved preferences
+- **Interest Tracking** - Save favorite UPSC categories for tailored content
+- **Session History** - Access past sessions and track learning progress
+- **Multi-device Support** - Seamless experience across devices
+
+### 🎧 Audio Intelligence Briefs
+- **Text-to-Speech** - Convert articles to audio using Google Cloud TTS
+- **Indian English Voice** - Natural-sounding voice optimized for Indian accent
+- **Mobile-Friendly** - Listen to briefs on-the-go during commute
+- **Streaming Support** - Direct audio streaming from API
+- **Downloadable** - Save audio files for offline listening
+
+### 📊 Advanced Analytics & Performance Tracking
+- **Category-wise Performance** - Track accuracy across 8 UPSC topics
+- **Weak Topic Identification** - AI identifies areas needing improvement
+- **Time Tracking** - Monitor time spent per question
+- **Progress Visualization** - Interactive charts and metrics
+- **GS Paper Mapping** - Questions mapped to General Studies Papers 1-4
+
+### 🎯 Smart Content Curation
+- **AI-Powered Scoring** - Gemini 2.0 Flash evaluates Prelims (0-10) and Mains (0-10) relevance
+- **Quality Filtering** - Only articles with score ≥5 are included
+- **Multi-Source Aggregation** - PIB, The Hindu, Indian Express
+- **Exam Angle Extraction** - AI identifies UPSC-specific angles
+- **Category Classification** - 8 UPSC topics (Polity, Economy, Environment, etc.)
+
+### 📝 Intelligent MCQ Generation
+- **3 MCQs per Article** - Comprehensive coverage with 45+ questions daily
+- **GS Paper Mapping** - Each question mapped to specific General Studies paper
+- **Detailed Explanations** - In-depth reasoning for correct answers
+- **Learning Insights** - Key takeaways for better retention
+- **Difficulty Calibration** - Questions aligned with UPSC pattern
+
+### 📧 Automated Email Digests
+- **Daily Intelligence Briefs** - Top 5 articles delivered to inbox
+- **PDF Reports** - Detailed analysis with exam angles
+- **Audio Attachments** - MP3 files for mobile listening
+- **Dashboard Links** - Direct access to interactive practice
+- **Scheduled Delivery** - Automated daily at 6:00 AM
 
 ---
 
@@ -251,10 +306,29 @@ sequenceDiagram
 - Composes personalized email
 - Includes dashboard link + audio
 - Sends at optimal time
+- Supports multilingual content
 ```
 
 **Technology**: SMTP, ReportLab PDF  
 **Output**: Email digest → User inbox
+
+---
+
+### 7. 🌐 Translation Agent
+**Autonomy Level**: High  
+**Decision Making**: Language detection, translation quality, context preservation
+
+```python
+# Autonomous multilingual translation
+- Translates articles to 12 Indian languages
+- Preserves UPSC terminology and context
+- Handles MCQs, explanations, and insights
+- Real-time on-demand translation
+- Maintains native script accuracy
+```
+
+**Technology**: Sarvam AI Translation API  
+**Output**: Translated content → User interface
 
 ---
 
@@ -270,6 +344,8 @@ sequenceDiagram
 | **Quality Control** | Human review | Autonomous filtering (score ≥ 5) |
 | **Scalability** | Limited by human time | Scales infinitely |
 | **Consistency** | Varies by human | Consistent AI reasoning |
+| **Language Support** | Single language | 12 Indian languages with AI translation |
+| **Personalization** | Generic content | User-specific interests and preferences |
 
 ### Real-World Impact
 
@@ -288,6 +364,8 @@ sequenceDiagram
 - Node.js 18+
 - Google Gemini API Key
 - Gmail SMTP credentials
+- Sarvam AI API Key (for multilingual support)
+- Google Cloud TTS credentials (for audio generation)
 
 ### Installation
 
@@ -365,6 +443,10 @@ graph TB
 - **Learning Insights**: Key takeaways for retention
 - **Progress Tracking**: Category-wise performance analytics
 - **Audio Playback**: Listen to briefs on-the-go
+- **Language Selector**: Switch between 12 Indian languages instantly
+- **User Authentication**: Secure login with personalized experience
+- **Interest Management**: Save favorite UPSC categories
+- **Session History**: Access past sessions and track progress
 
 ### 📧 Email Digest
 
@@ -384,18 +466,29 @@ newsnexus/
 │   │   ├── scraper.py          # RSS feed scraping
 │   │   ├── analyser.py         # UPSC relevance scoring
 │   │   ├── mcq_generator.py    # Question generation
-│   │   ├── audio_agent.py      # Text-to-speech
+│   │   ├── audio_agent.py      # Text-to-speech generation
 │   │   └── digest.py           # Email delivery
 │   └── utils/
 │       ├── database.py         # SQLite operations
+│       ├── translator.py       # Sarvam AI translation
 │       └── pdf_generator.py    # PDF creation
 ├── dashboard/
 │   └── src/
 │       ├── components/         # React components
+│       │   ├── Auth.jsx        # Authentication
+│       │   ├── Dashboard.jsx   # Main dashboard
+│       │   ├── UserDashboard.jsx # User-specific view
+│       │   ├── Interests.jsx   # Interest management
+│       │   └── LanguageSelector.jsx # Language switcher
+│       ├── locales/            # Translation files (12 languages)
+│       ├── i18n.js             # i18n configuration
 │       └── App.js
-├── api.py                      # FastAPI backend
+├── config/
+│   └── .env.example            # Environment variables template
+├── api.py                      # FastAPI backend with auth
 ├── main.py                     # CLI interface
 ├── scheduler.py                # Automated scheduling
+├── setup.py                    # Database initialization
 └── requirements.txt
 ```
 
@@ -406,11 +499,12 @@ newsnexus/
 ### Public Endpoints
 
 ```http
-GET  /session/{token}                    # Get session details
-GET  /session/{token}/mcq/{article_id}   # Get MCQ for article
-POST /session/{token}/attempt            # Submit answer
+GET  /session/{token}?lang=hi            # Get session details (with language)
+GET  /session/{token}/mcq/{article_id}?lang=ta   # Get MCQ (with translation)
+POST /session/{token}/attempt?lang=bn    # Submit answer (with translation)
 GET  /session/{token}/results            # Get results
 GET  /session/{token}/audio/stream       # Stream audio brief
+GET  /languages                          # Get supported languages
 ```
 
 ### Authenticated Endpoints
@@ -420,6 +514,7 @@ POST /auth/signup                        # User registration
 POST /auth/login                         # User login
 GET  /auth/me                            # Get current user
 POST /user/interests                     # Save interests
+GET  /user/interests                     # Get user interests
 GET  /user/dashboard                     # Get user dashboard
 POST /user/trigger-pipeline              # Start new session
 ```
@@ -488,16 +583,20 @@ erDiagram
 ### Backend
 - **Framework**: FastAPI
 - **AI**: Google Gemini 2.0 Flash
+- **Translation**: Sarvam AI (12 Indian languages)
 - **Database**: SQLite
-- **TTS**: gTTS (Google Translate TTS)
+- **TTS**: Google Cloud Text-to-Speech
 - **PDF**: ReportLab
 - **Auth**: JWT + bcrypt
+- **Email**: SMTP (Gmail)
 
 ### Frontend
 - **Framework**: React 18
 - **Routing**: React Router v6
+- **i18n**: react-i18next (multilingual UI)
 - **Styling**: Custom CSS (Editorial design)
 - **HTTP**: Fetch API
+- **State Management**: React Context
 
 ### DevOps
 - **Scheduler**: APScheduler
@@ -508,12 +607,14 @@ erDiagram
 
 ## 🔐 Security
 
-- **JWT Authentication**: Secure token-based auth
-- **Password Hashing**: bcrypt with salt
-- **CORS**: Configured for production
+- **JWT Authentication**: Secure token-based auth with 7-day expiry
+- **Password Hashing**: bcrypt with salt rounds
+- **CORS**: Configured for production origins
 - **Environment Variables**: Sensitive data in `.env`
 - **SQL Injection**: Parameterized queries
 - **Rate Limiting**: Built-in FastAPI middleware
+- **API Key Protection**: Sarvam AI and Gemini keys secured
+- **Session Tokens**: Unique dashboard tokens per session
 
 ---
 
@@ -557,8 +658,13 @@ python -c "from src.agents.digest import send_digest; send_digest([], save_previ
 
 ### Audio Generation Fails
 
-**Issue**: `gTTS` network errors  
-**Solution**: Check internet connection, gTTS uses Google Translate API
+**Issue**: Google Cloud TTS errors  
+**Solution**: Check Google Cloud credentials and API quota
+
+### Translation Not Working
+
+**Issue**: Sarvam API errors  
+**Solution**: Verify `SARVAM_API_KEY` in `.env` file and check API quota
 
 ### Email Not Sending
 
@@ -574,7 +680,12 @@ python -c "from src.agents.digest import send_digest; send_digest([], save_previ
 ### MCQ Generation Slow
 
 **Issue**: Gemini API rate limits  
-**Solution**: Reduce `count=3` to `count=1` in `api.py` line 450
+**Solution**: Reduce `count=3` to `count=1` in `api.py` or upgrade API tier
+
+### Language Not Switching
+
+**Issue**: Translation service unavailable  
+**Solution**: Check Sarvam API key and network connection
 
 ---
 
@@ -597,9 +708,11 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🙏 Acknowledgments
 
 - **News Sources**: PIB, The Hindu, Indian Express
-- **AI**: Google Gemini
-- **TTS**: Google Translate TTS (gTTS)
+- **AI**: Google Gemini 2.0 Flash
+- **Translation**: Sarvam AI (Indian language support)
+- **TTS**: Google Cloud Text-to-Speech
 - **Design**: Inspired by premium editorial layouts
+- **Community**: UPSC aspirants for feedback and testing
 
 ---
 
